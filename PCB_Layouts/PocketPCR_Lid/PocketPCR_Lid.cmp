@@ -1,0 +1,339 @@
+Cmp-Mod V01 Created by PcbNew   date = Wed 16 Aug 2017 03:03:40 PM CEST
+
+BeginCmp
+TimeStamp = 5941F39A
+Path = /593B112F
+Reference = D2;
+ValeurCmp = APD;
+IdModule  = GaudiLabsFootPrints:LCC3_SMD;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F2E
+Path = /5937081A
+Reference = C1;
+ValeurCmp = 1uF;
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F3A
+Path = /59370DAC
+Reference = C2;
+ValeurCmp = 0.047uF/200 V(smaller);
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F46
+Path = /593710A8
+Reference = C3;
+ValeurCmp = 0.1uF / 200V;
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F52
+Path = /5937192C
+Reference = C4;
+ValeurCmp = 0.22uF;
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F5E
+Path = /5988A67E
+Reference = C5;
+ValeurCmp = 0.1uF;
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9F6A
+Path = /5989F744
+Reference = C6;
+ValeurCmp = 0.5-1pF;
+IdModule  = Capacitors_SMD:C_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FAD
+Path = /59371005
+Reference = R1;
+ValeurCmp = 4k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FB9
+Path = /5988C4BD
+Reference = R2;
+ValeurCmp = 1.2M (0);
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FC5
+Path = /5988C555
+Reference = R3;
+ValeurCmp = 1.2M (0);
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FD1
+Path = /598922A8
+Reference = R4;
+ValeurCmp = 3.3k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FDD
+Path = /59371162
+Reference = R5;
+ValeurCmp = 2.2M (1M);
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FE9
+Path = /593712F8
+Reference = R6;
+ValeurCmp = 24.9k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594E9FF5
+Path = /59371833
+Reference = R7;
+ValeurCmp = 20k (higher?);
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594EA001
+Path = /5937123B
+Reference = R8;
+ValeurCmp = 32.4k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594EA00D
+Path = /59899D50
+Reference = R9;
+ValeurCmp = 100k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594EA019
+Path = /59899DCC
+Reference = R10;
+ValeurCmp = 100k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 594EA02F
+Path = /593706D3
+Reference = U1;
+ValeurCmp = MAX1932;
+IdModule  = GaudiLabsFootPrints:QFN-12_4x4;
+EndCmp
+
+BeginCmp
+TimeStamp = 594EA04C
+Path = /598AA55A
+Reference = VREF;
+ValeurCmp = AREF;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 5949F009
+Path = /59406EB5
+Reference = JP2;
+ValeurCmp = Jumper_NC_Dual;
+IdModule  = Connect:GS3;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898BBF
+Path = /59370CE2
+Reference = D1;
+ValeurCmp = 220V;
+IdModule  = Diodes_SMD:SMB_Handsoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898BDD
+Path = /59891FB0
+Reference = D3;
+ValeurCmp = LED;
+IdModule  = GaudiLabsFootPrints:TOPLED;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898BE7
+Path = /59370915
+Reference = L1;
+ValeurCmp = 250uH / 0.1A;
+IdModule  = Choke_SMD:Choke_SMD_7.3x7.3_H3.5;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898C13
+Path = /5989F619
+Reference = R11;
+ValeurCmp = <1G Ohm;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898C30
+Path = /598ABAED
+Reference = SW1;
+ValeurCmp = BUT;
+IdModule  = GaudiLabsFootPrints:PUSH_BUTTON_SMD;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898C42
+Path = /5988DB91
+Reference = SW2;
+ValeurCmp = DC_JACK;
+IdModule  = GaudiLabsFootPrints:DC_JACK_SMD;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898C43
+Path = /5988D005
+Reference = U2;
+ValeurCmp = ARDUINO_MICRO;
+IdModule  = GaudiLabsFootPrints:ARDUINO_MICRO_SMD;
+EndCmp
+
+BeginCmp
+TimeStamp = 59898CAA
+Path = /59898E1D
+Reference = U3;
+ValeurCmp = OPA656;
+IdModule  = GaudiLabsFootPrints:SOIC-08_N;
+EndCmp
+
+BeginCmp
+TimeStamp = 598AF7A6
+Path = /593B2ECF
+Reference = VBIAS;
+ValeurCmp = VBiasM;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 598AF7AB
+Path = /593FF858
+Reference = GND;
+ValeurCmp = GND;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 598EB50D
+Path = /59370B8C
+Reference = N1;
+ValeurCmp = BSS131;
+IdModule  = TO_SOT_Packages_SMD:SOT-23;
+EndCmp
+
+BeginCmp
+TimeStamp = 598EB51D
+Path = /5989AF8B
+Reference = N2;
+ValeurCmp = BSS131;
+IdModule  = TO_SOT_Packages_SMD:SOT-23;
+EndCmp
+
+BeginCmp
+TimeStamp = 59946415
+Path = /598A1D9C
+Reference = R12;
+ValeurCmp = 10k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 599692C9
+Path = /598A1818
+Reference = TH1;
+ValeurCmp = Thermistor_NTC 10k;
+IdModule  = Resistors_SMD:R_0805_HandSoldering;
+EndCmp
+
+BeginCmp
+TimeStamp = 5991BFAF
+Path = /598A8A84
+Reference = X2;
+ValeurCmp = P+;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_4x2mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 5991BFB3
+Path = /598A8DC8
+Reference = X3;
+ValeurCmp = P-;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_4x2mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 598B989D
+Path = 
+Reference = G***;
+ValeurCmp = LOGO;
+IdModule  = GaudiLabsLogos:OpenAPD_Photonpack2;
+EndCmp
+
+BeginCmp
+TimeStamp = 598B9DE0
+Path = 
+Reference = G***;
+ValeurCmp = LOGO;
+IdModule  = GaudiLabsLogos:OpenAPD_Photonpack2;
+EndCmp
+
+BeginCmp
+TimeStamp = 598C11DC
+Path = 
+Reference = G***;
+ValeurCmp = LOGO;
+IdModule  = GaudiLabsLogos:OpenHardwareLogo;
+EndCmp
+
+BeginCmp
+TimeStamp = 598E916B
+Path = /598C3916
+Reference = JP1;
+ValeurCmp = Jumper_NC_Dual;
+IdModule  = Connect:GS3;
+EndCmp
+
+BeginCmp
+TimeStamp = 598E9175
+Path = /598C54FE
+Reference = BLOW-;
+ValeurCmp = BLOWER+;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_3mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 598E917A
+Path = /598C576B
+Reference = BLOW+;
+ValeurCmp = BLOWER-;
+IdModule  = GaudiLabsFootPrints:PAD_SMD_3mm;
+EndCmp
+
+EndListe

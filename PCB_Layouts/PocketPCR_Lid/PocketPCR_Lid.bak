@@ -1,0 +1,106 @@
+EESchema Schematic File Version 4
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:Thermistor_NTC NTC1
+U 1 1 5D0A142B
+P 3650 3550
+F 0 "NTC1" H 3748 3596 50  0000 L CNN
+F 1 "Thermistor_NTC" H 3748 3505 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0402_1005Metric" H 3650 3600 50  0001 C CNN
+F 3 "~" H 3650 3600 50  0001 C CNN
+	1    3650 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD H1
+U 1 1 5D0A16BA
+P 5300 3000
+F 0 "H1" V 5342 2942 60  0000 R CNN
+F 1 "PAD" V 5236 2942 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 5300 3000 60  0001 C CNN
+F 3 "" H 5300 3000 60  0001 C CNN
+	1    5300 3000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD H2
+U 1 1 5D0A17DF
+P 5300 4150
+F 0 "H2" V 5236 4238 60  0000 L CNN
+F 1 "PAD" V 5342 4238 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 5300 4150 60  0001 C CNN
+F 3 "" H 5300 4150 60  0001 C CNN
+	1    5300 4150
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD TH1
+U 1 1 5D0A1894
+P 3650 3000
+F 0 "TH1" V 3692 2942 60  0000 R CNN
+F 1 "PAD" V 3586 2942 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3650 3000 60  0001 C CNN
+F 3 "" H 3650 3000 60  0001 C CNN
+	1    3650 3000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD TH2
+U 1 1 5D0A1901
+P 3650 4150
+F 0 "TH2" V 3586 4238 60  0000 L CNN
+F 1 "PAD" V 3692 4238 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3650 4150 60  0001 C CNN
+F 3 "" H 3650 4150 60  0001 C CNN
+	1    3650 4150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3650 3100 3650 3400
+Wire Wire Line
+	3650 3700 3650 4050
+Wire Wire Line
+	5300 3100 5300 3350
+Wire Wire Line
+	5300 3350 5250 3350
+Wire Wire Line
+	5250 3350 5250 3450
+Wire Wire Line
+	5250 3450 5300 3450
+Wire Wire Line
+	5300 3450 5300 3550
+Wire Wire Line
+	5300 3550 5250 3550
+Wire Wire Line
+	5250 3550 5250 3650
+Wire Wire Line
+	5250 3650 5300 3650
+Wire Wire Line
+	5300 3650 5300 3750
+Wire Wire Line
+	5300 3750 5250 3750
+Wire Wire Line
+	5250 3750 5250 3850
+Wire Wire Line
+	5250 3850 5300 3850
+Wire Wire Line
+	5300 3850 5300 4050
+Text Label 5400 3650 0    60   ~ 0
+HEATER
+Wire Wire Line
+	5400 3650 5300 3650
+Connection ~ 5300 3650
+$EndSCHEMATC

@@ -1,0 +1,17 @@
+
+- Alluminium not Cooper
+2.7    0,896  2.4
+8.96  0,382   3.42272
+
+- Temp Sensor Lid Missing
+- Abstand Lüfter Connector <2.54
+- Verdrehen des Heated Lid?
+
+
+-C14 zu nah  am Connector
+-Lötmaske USB Connector Pads
+- +/- Beschriftung Blower
+
+- ADC TempSens gestört von USB Leitungen -> Layout, ADC Leitung, 3.3V besser verlegen, C auf 3.3V und C auf Analog Leitung.
+
+- Encoder Debounce Schaltung
