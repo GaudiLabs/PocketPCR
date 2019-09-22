@@ -24,6 +24,7 @@
 #include "Adafruit_GFX.h"
 #include <Adafruit_SSD1306.h>
 #include "Rotary.h"
+#include "FlashStorage.h"
 
 #include <Fonts/FreeSans9pt7b.h>
 
@@ -57,23 +58,30 @@ Rotary rotary = Rotary(ENCODER_1, ENCODER_2);
 #define CASE_Settings 2
 #define CASE_EditSettings 3
 #define CASE_Run 4
+#define CASE_Done 5
 
 #define PCR_set 1
 #define PCR_transition 2
 #define PCR_time 3
 #define PCR_end 4
 
-
-
 #define PIDp 0.6
 #define PIDi 1
 #define PIDd 0.2
 
-#define SETTING_Size 5
+#define SETTING_Size 6
+
+
 String SETTING_String[SETTING_Size] = { "Init", "Denature", "Annealing" , "Extension", "Final" };
-int SETTING_Value[SETTING_Size*2];
 int SETTING_cycles = 20;
 
+typedef struct {
+int value[SETTING_Size*2];
+} EEprom;
+
+FlashStorage(my_flash_store, EEprom);
+EEprom settings;
+  
 Adafruit_SSD1306 display( OLED_MOSI,OLED_CLK,OLED_DC, OLED_RESET, OLED_CS);
 
 int sensorValue = 0;        // value read from the pot
@@ -125,20 +133,24 @@ void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(115200);
 
-SETTING_Value[0] = 99;      
-SETTING_Value[1] = 60;   
 
-SETTING_Value[2] = 95;      
-SETTING_Value[3] = 120;  
 
-SETTING_Value[4] = 55;      
-SETTING_Value[5] = 80;  
+settings.value[0] = 99;
 
-SETTING_Value[6] = 72;      
-SETTING_Value[7] = 40;  
+settings.value[0] = 99;      
+settings.value[1] = 60;   
 
-SETTING_Value[8] = 25;      
-SETTING_Value[9] = 00;  
+settings.value[2] = 95;      
+settings.value[3] = 120;  
+
+settings.value[4] = 55;      
+settings.value[5] = 80;  
+
+settings.value[6] = 72;      
+settings.value[7] = 40;  
+
+settings.value[8] = 25;      
+settings.value[9] = 00;  
 
 
     display.begin(SSD1306_SWITCHCAPVCC);
@@ -159,7 +171,7 @@ SETTING_Value[9] = 00;
 
    analogReadResolution(12);
 
-
+settings=my_flash_store.read();
     
 }
 
@@ -226,13 +238,13 @@ case CASE_Main:
     
 case CASE_Settings:
 
-    if (counter>11) counter=0;
-    if (counter<0) counter=11;
+    if (counter>12) counter=0;
+    if (counter<0) counter=12;
     MenuItem = counter;
-    if ((MenuItem%2==1)&&(SETTING_Value[MenuItem]>90)) minuteMode=true; else minuteMode=false;
+    if ((MenuItem%2==1)&&(settings.value[MenuItem]>90)) minuteMode=true; else minuteMode=false;
     if (!digitalRead(butPin)) 
     {while (!digitalRead(butPin)); caseUX=CASE_EditSettings; 
-    if (minuteMode) counter=SETTING_Value[MenuItem]/60; else counter=SETTING_Value[MenuItem];}
+    if (minuteMode) counter=settings.value[MenuItem]/60; else counter=settings.value[MenuItem];}
     draw_setup_display();
     
     break;
@@ -241,9 +253,13 @@ case CASE_EditSettings:
 
     
     if (MenuItem%2==0)
-     {if (counter<25) counter=25;
-      if (counter>99) {counter=99;}
-
+     {if (MenuItem==10) 
+         {if (counter<1) counter=1;
+          if (counter>99) counter=99;}
+     else 
+        {if (counter<25) counter=25;
+        if (counter>99) counter=99;}
+     
      } // Temp Menu
      
      else
@@ -257,8 +273,10 @@ case CASE_EditSettings:
        } //not Minut Mode
       } // Time Menu
     
-    if (MenuItem==10) caseUX=CASE_Main;
-    if (MenuItem<10) {if (minuteMode) SETTING_Value[MenuItem]=counter*60; else SETTING_Value[MenuItem]=counter;}
+    if (MenuItem==11) {caseUX=CASE_Main;   my_flash_store.write(settings);}
+    if (MenuItem==12) {caseUX=CASE_Main;  settings=my_flash_store.read();}
+
+    if (MenuItem<11) {if (minuteMode) settings.value[MenuItem]=counter*60; else settings.value[MenuItem]=counter;}
     if (!digitalRead(butPin)) {while (!digitalRead(butPin)); caseUX=CASE_Settings;counter=MenuItem;}
     draw_setup_display();
     
@@ -282,8 +300,8 @@ case CASE_Run:
     switch (casePCR) {
 
     case PCR_set:
-    TEMPset=SETTING_Value[PCRstate*2];
-    TIMEcontrol=SETTING_Value[1+PCRstate*2];
+    TEMPset=settings.value[PCRstate*2];
+    TIMEcontrol=settings.value[1+PCRstate*2];
     casePCR=PCR_transition;
     break;
 
@@ -304,15 +322,17 @@ case CASE_Run:
     case PCR_time:
 
     runPID();
-    TIMEcontrol=SETTING_Value[1+PCRstate*2]-(millis()-TIMEclick)/1000;
+    TIMEcontrol=settings.value[1+PCRstate*2]-(millis()-TIMEclick)/1000;
     draw_run_display();
 
     if (TIMEcontrol<=0) {
+      if (PCRstate==4) caseUX=CASE_Done;
     if (PCRstate==3)
     {PCRstate=1;
     PCRcycle++;
+    if (PCRcycle>settings.value[10]) PCRstate=4;
     } else
-    {PCRstate++;casePCR=PCR_set;};
+    {PCRstate++;};
     casePCR=PCR_set;
     }
     break;
@@ -324,6 +344,23 @@ case CASE_Run:
 
     break;
 
+case CASE_Done:
+
+analogWrite(fanPin,0);
+analogWrite(heaterPin,0);
+
+display.clearDisplay(); 
+   display.setFont(&FreeSans9pt7b);
+
+  display.fillRect(10,10,100,40,1);
+   display.setCursor(15,30);
+    display.setTextColor(0);
+ display.println("PCR Done");
+ display.display(); 
+    display.setFont();
+
+break;
+      
 default:
     // Statement(s)
     break;
@@ -335,17 +372,19 @@ default:
 
 
 void draw_value_box(int x, int y, int val, bool highlight,bool edit)
-{
+{ int shift;
+
+if ((val<46)&&(x>22)&&(x<100)) shift=-13; else shift=0;
 
   display.drawRect(x-3,y+2-val/2,17,val/2-1,1);
   
 if (highlight&&!edit){
-  display.fillRect(x-3,y+2-val/2,17,11,1);
+  display.fillRect(x-3,y+2-val/2+shift,17,11,1);
   display.setTextColor(0);
 }
-if (highlight&&edit)  display.drawRect(x-2,y+2-val/2,15,11,1);
+if (highlight&&edit) display.drawRect(x-2,y+2-val/2+shift,15,11,1);
 
- display.setCursor(x,y-val/2+4);
+ display.setCursor(x,y-val/2+4+shift);
  display.println(val);
  display.setTextColor(1);
 };
@@ -383,17 +422,19 @@ void draw_setup_display()
   
 display.clearDisplay(); 
 
- if (MenuItem<10) {
+ if (MenuItem<11) {
   
 display.setCursor(5,0);
 //display.print("Set ");
+
+if (MenuItem<10){
 display.print(SETTING_String[MenuItem/2]);
 if (MenuItem%2==0) {display.print(" Temp. [");display.print("\xA7");display.print("C]");} else {display.print(" Time "); if (minuteMode) display.print("[min]"); else display.print("[s]");  }
-
+} else display.print("No of cycles");
  } else 
 
  {
- if (MenuItem==11)   // Set or Cancel
+ if (MenuItem==12)   // Set or Cancel
  {
 
  display.setCursor(34,0);
@@ -418,17 +459,35 @@ if (MenuItem%2==0) {display.print(" Temp. [");display.print("\xA7");display.prin
 }
 
 
-draw_value_box (21,55,SETTING_Value[0],MenuItem==0,caseUX==CASE_EditSettings);
-draw_value_box (43,55,SETTING_Value[2],MenuItem==2,caseUX==CASE_EditSettings);
-draw_value_box (63,55,SETTING_Value[4],MenuItem==4,caseUX==CASE_EditSettings);
-draw_value_box (83,55,SETTING_Value[6],MenuItem==6,caseUX==CASE_EditSettings);
-draw_value_box (105,55,SETTING_Value[8],MenuItem==8,caseUX==CASE_EditSettings);
+draw_value_box (21,55,settings.value[0],MenuItem==0,caseUX==CASE_EditSettings);
+draw_value_box (43,55,settings.value[2],MenuItem==2,caseUX==CASE_EditSettings);
+draw_value_box (63,55,settings.value[4],MenuItem==4,caseUX==CASE_EditSettings);
+draw_value_box (83,55,settings.value[6],MenuItem==6,caseUX==CASE_EditSettings);
+draw_value_box (105,55,settings.value[8],MenuItem==8,caseUX==CASE_EditSettings);
 
-draw_value (21,57,SETTING_Value[1],MenuItem==1,caseUX==CASE_EditSettings);
-draw_value (43,57,SETTING_Value[3],MenuItem==3,caseUX==CASE_EditSettings);
-draw_value (63,57,SETTING_Value[5],MenuItem==5,caseUX==CASE_EditSettings);
-draw_value (83,57,SETTING_Value[7],MenuItem==7,caseUX==CASE_EditSettings);
-draw_value (105,57,SETTING_Value[9],MenuItem==9,caseUX==CASE_EditSettings);
+
+display.drawRect(38,45,61,11,1);
+display.fillRect(38+1,45+1,61-2,11-2,0);
+
+
+if ((MenuItem==10)&&!(caseUX==CASE_EditSettings)){
+  display.fillRect(56,45,25,11,1);
+  display.setTextColor(0);
+}
+if ((MenuItem==10)&&(caseUX==CASE_EditSettings))  display.drawRect(56,45,25,11,1);
+
+ display.setCursor(60,47);
+ display.print(settings.value[10]);
+ display.print("x");
+ display.setTextColor(1);
+
+ 
+
+draw_value (21,57,settings.value[1],MenuItem==1,caseUX==CASE_EditSettings);
+draw_value (43,57,settings.value[3],MenuItem==3,caseUX==CASE_EditSettings);
+draw_value (63,57,settings.value[5],MenuItem==5,caseUX==CASE_EditSettings);
+draw_value (83,57,settings.value[7],MenuItem==7,caseUX==CASE_EditSettings);
+draw_value (105,57,settings.value[9],MenuItem==9,caseUX==CASE_EditSettings);
 
    
 
@@ -478,6 +537,9 @@ display.clearDisplay();
  
   }
   display.setFont();
+
+   display.setTextColor(1);
+
     display.display();
 
   }
@@ -507,12 +569,12 @@ display.print("State: ");
 
  display.setCursor(0,55-18);
  display.print("Set Temp: ");
- display.print(SETTING_Value[PCRstate*2]);
+ display.print(settings.value[PCRstate*2]);
  display.print(" \xA7");display.print("C");
 
  display.setCursor(0,55-9);
  display.print("Block Temp: ");
- display.print(temperature_mean);
+ display.print(temperature_mean,1);
  display.print(" \xA7");display.print("C");
  display.setCursor(0,55);
  display.print("Time: ");
