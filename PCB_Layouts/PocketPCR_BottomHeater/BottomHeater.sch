@@ -1,0 +1,214 @@
+EESchema Schematic File Version 4
+EELAYER 26 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:Thermistor_NTC NTC1
+U 1 1 5D0A142B
+P 3550 3500
+F 0 "NTC1" V 3600 2650 50  0000 L CNN
+F 1 "Thermistor_NTC" V 3700 3200 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0402_1005Metric" H 3550 3550 50  0001 C CNN
+F 3 "~" H 3550 3550 50  0001 C CNN
+	1    3550 3500
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD HT1
+U 1 1 5D0A16BA
+P 5550 3000
+F 0 "HT1" V 5592 2942 60  0000 R CNN
+F 1 "PAD" V 5486 2942 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 5550 3000 60  0001 C CNN
+F 3 "" H 5550 3000 60  0001 C CNN
+	1    5550 3000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD HB2
+U 1 1 5D0A17DF
+P 6150 4150
+F 0 "HB2" V 6200 3900 60  0000 L CNN
+F 1 "PAD" V 6100 3850 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 6150 4150 60  0001 C CNN
+F 3 "" H 6150 4150 60  0001 C CNN
+	1    6150 4150
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD ST1
+U 1 1 5D0A1894
+P 3150 3050
+F 0 "ST1" V 3192 2992 60  0000 R CNN
+F 1 "PAD" V 3086 2992 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3150 3050 60  0001 C CNN
+F 3 "" H 3150 3050 60  0001 C CNN
+	1    3150 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD ST2
+U 1 1 5D0A1901
+P 3900 3050
+F 0 "ST2" V 3950 3150 60  0000 L CNN
+F 1 "PAD" V 3850 3150 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3900 3050 60  0001 C CNN
+F 3 "" H 3900 3050 60  0001 C CNN
+	1    3900 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD SB1
+U 1 1 5D0BAAB6
+P 3150 4050
+F 0 "SB1" V 3200 4250 60  0000 R CNN
+F 1 "PAD" V 3100 4250 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3150 4050 60  0001 C CNN
+F 3 "" H 3150 4050 60  0001 C CNN
+	1    3150 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD HB1
+U 1 1 5D0BAAF4
+P 5550 4150
+F 0 "HB1" V 5592 4092 60  0000 R CNN
+F 1 "PAD" V 5486 4092 60  0000 R CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 5550 4150 60  0001 C CNN
+F 3 "" H 5550 4150 60  0001 C CNN
+	1    5550 4150
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD HT2
+U 1 1 5D0BAB28
+P 6150 3000
+F 0 "HT2" V 6200 3100 60  0000 L CNN
+F 1 "PAD" V 6100 3100 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 6150 3000 60  0001 C CNN
+F 3 "" H 6150 3000 60  0001 C CNN
+	1    6150 3000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD SB2
+U 1 1 5D0BAC52
+P 3900 4050
+F 0 "SB2" V 3950 3800 60  0000 L CNN
+F 1 "PAD" V 3850 3800 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 3900 4050 60  0001 C CNN
+F 3 "" H 3900 4050 60  0001 C CNN
+	1    3900 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD CT1
+U 1 1 5D0BAD7E
+P 6850 3050
+F 0 "CT1" V 7000 3200 60  0000 L CNN
+F 1 "PAD" V 6892 3138 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 6850 3050 60  0001 C CNN
+F 3 "" H 6850 3050 60  0001 C CNN
+	1    6850 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L GaudiLabsPartsLibrary:PAD CB1
+U 1 1 5D0BAE67
+P 6850 4200
+F 0 "CB1" V 6900 3950 60  0000 L CNN
+F 1 "PAD" V 6800 3950 60  0000 L CNN
+F 2 "GaudiLabsFootPrints:SolderPad1_8mm" H 6850 4200 60  0001 C CNN
+F 3 "" H 6850 4200 60  0001 C CNN
+	1    6850 4200
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6850 3150 6850 3700
+Wire Wire Line
+	5150 3450 5150 3350
+Wire Wire Line
+	5150 3350 5050 3350
+Wire Wire Line
+	5050 3350 5050 3450
+Wire Wire Line
+	5050 3450 4950 3450
+Wire Wire Line
+	4950 3450 4950 3350
+Wire Wire Line
+	4950 3350 4850 3350
+Wire Wire Line
+	4850 3350 4850 3450
+Wire Wire Line
+	4850 3450 4750 3450
+Wire Wire Line
+	4750 3450 4750 3350
+Wire Wire Line
+	4750 3350 4650 3350
+Wire Wire Line
+	4650 3800 4750 3800
+Wire Wire Line
+	4750 3800 4750 3700
+Wire Wire Line
+	4750 3700 4850 3700
+Wire Wire Line
+	4850 3700 4850 3800
+Wire Wire Line
+	4850 3800 4950 3800
+Wire Wire Line
+	4950 3800 4950 3700
+Wire Wire Line
+	4950 3700 5050 3700
+Wire Wire Line
+	5050 3700 5050 3800
+Wire Wire Line
+	5050 3800 5150 3800
+Wire Wire Line
+	5150 3800 5150 3700
+Wire Wire Line
+	4650 3350 4650 3800
+Wire Wire Line
+	6150 3100 6150 3700
+Wire Wire Line
+	3150 3150 3150 3500
+Wire Wire Line
+	3900 3150 3900 3500
+Wire Wire Line
+	3150 3500 3150 3950
+Connection ~ 3150 3500
+Wire Wire Line
+	3900 3500 3900 3950
+Connection ~ 3900 3500
+Wire Wire Line
+	3150 3500 3400 3500
+Wire Wire Line
+	3700 3500 3900 3500
+Wire Wire Line
+	5550 3100 5550 3450
+Wire Wire Line
+	5150 3450 5550 3450
+Connection ~ 5550 3450
+Wire Wire Line
+	5550 3450 5550 4050
+Wire Wire Line
+	5150 3700 6150 3700
+Connection ~ 6150 3700
+Wire Wire Line
+	6150 3700 6150 4050
+Wire Wire Line
+	6150 3700 6850 3700
+Connection ~ 6850 3700
+Wire Wire Line
+	6850 3700 6850 4100
+$EndSCHEMATC

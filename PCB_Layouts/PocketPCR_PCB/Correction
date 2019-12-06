@@ -15,3 +15,32 @@
 - ADC TempSens gestört von USB Leitungen -> Layout, ADC Leitung, 3.3V besser verlegen, C auf 3.3V und C auf Analog Leitung.
 
 - Encoder Debounce Schaltung
+
+- Heated Lid Temp Sens
+
+- TempSens Platz + Loch
+
+- weiss
+
+- Grosses C über 5V
+
+
+- Temp Sensor Pocket Position und grösse korrigieren
+
+- Lüfter Stecker 2.0mm? Abstand von Gehäuserand vergrössern, Stecker auf Silk zeichnen, 180° drehen?
+
+- Beschriftung TopHeater Pads bereinigen
+
+- C3 zu gross
+
+- Fiducials ok? 
+
+- Warning Hot Surface Logo auf Silk-Screen
+
+- QC passed white square if PCB black
+
+- TLV1117-33 (U1) kleiner
+
+- Beschriftung c13 (fixed)
+
+

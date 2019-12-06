@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name OpenAPD-rescue)(type Legacy)(uri ${KIPRJMOD}/OpenAPD-rescue.lib)(options "")(descr ""))
-)
