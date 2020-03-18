@@ -1,0 +1,42 @@
+### Module positions - created on Do 13 Feb 2020 17:24:32 CET ###
+### Printed by Pcbnew version kicad 5.0.2-bee76a0~70~ubuntu18.04.1
+## Unit = mm, Angle = deg.
+## Side : bottom
+# Ref     Val                                 Package                                           PosX       PosY       Rot  Side
+C1        1uF                                 C_0805_2012Metric                             -21.9860    18.1806  180.0000  bottom
+C2        100uF,35V                           C_1206_3216Metric                             -40.8110    18.1890  180.0000  bottom
+C3        22uF                                C_1206_3216Metric_Pad1.42x1.75mm_HandSolder   -49.9860    -8.4360  180.0000  bottom
+C4        1uF                                 C_0805_2012Metric                             -44.4860    17.5890   90.0000  bottom
+C5        22uF                                C_1206_3216Metric                             -35.8730    18.2140  180.0000  bottom
+C6        100nF                               C_0805_2012Metric                             -38.3790     4.9660    0.0000  bottom
+C7        100nF                               C_0805_2012Metric                             -25.9070    18.1806    0.0000  bottom
+C8        100nF                               C_0805_2012Metric                             -15.1280    13.8880  270.0000  bottom
+C9        100nF                               C_0805_2012Metric                             -29.3130     6.8490   90.0000  bottom
+C10       22pF                                C_0805_2012Metric                             -29.9108    17.6472  270.0000  bottom
+C11       22pF                                C_0805_2012Metric                             -31.9936    17.6726  270.0000  bottom
+C12       1uF                                 C_0805_2012Metric                             -29.9870    11.2718   90.0000  bottom
+C13       100nF                               C_0805_2012Metric                              -3.7360     6.8140  180.0000  bottom
+C14       1uF                                 C_0805_2012Metric                             -10.4860    -2.2485  270.0000  bottom
+C15       2.2uF                               C_0805_2012Metric                             -37.3530    -0.5900   90.0000  bottom
+C16       1uF                                 C_0805_2012Metric                             -10.4860    -6.3735  270.0000  bottom
+C17       2.2uF                               C_0805_2012Metric                             -37.3022    -4.8412  270.0000  bottom
+J2        Conn_02x05_Odd_Even                 Pin_Header_Straight_2x05_Pitch1.27mm_SMD       -5.2220    14.6050  270.0000  bottom
+J3        USB_C_Receptacle                    USB_C_Receptacle_Amphenol_12401610E4-2A       -63.4330     4.0990  270.0000  bottom
+LED1      LED                                 LED-0805                                      -49.5430    17.2840  270.0000  bottom
+LED2      LED                                 LED-0805                                      -46.8130    17.2840  270.0000  bottom
+Q1        Q_NMOS_GSD                          SOT-23                                         -0.7360    -0.6860  180.0000  bottom
+Q2        Q_NMOS_GSD                          SOT-23                                         -5.5428    -0.6860    0.0000  bottom
+Q3        Q_NMOS_GSD                          SOT-23                                         -0.7516     3.8630    0.0000  bottom
+R1        10k                                 R_0805_2012Metric                             -18.2420    18.2060  180.0000  bottom
+R2        390                                 R_0805_2012Metric                             -50.1800    13.8880    0.0000  bottom
+R3        390                                 R_0805_2012Metric                             -46.2430    13.8990    0.0000  bottom
+R4        4.7k                                R_0805_2012Metric                              -2.7290     8.9400  180.0000  bottom
+R5        390k                                R_0805_2012Metric                              -6.8750     8.9210  180.0000  bottom
+R6        4.7k                                R_0805_2012Metric                             -10.9860     9.5015   90.0000  bottom
+R7        390k                                R_0805_2012Metric                             -34.6098    -4.8666  270.0000  bottom
+R9        5k                                  R_0805_2012Metric                             -61.7370    11.4750  180.0000  bottom
+R10       5k                                  R_0805_2012Metric                             -58.3740    11.4750    0.0000  bottom
+U1        TLV1117-33                          SOT-223                                       -37.7930    12.0370    0.0000  bottom
+U2        SAMD21G18B-A___changed_from_SAML21  TQFP-48_7x7mm_Pitch0.5mm                      -22.4130    11.2530  180.0000  bottom
+Y1        32.765                              Crystal_SMD_3215-2pin_3.2x1.5mm               -30.9800    14.4976  180.0000  bottom
+## End

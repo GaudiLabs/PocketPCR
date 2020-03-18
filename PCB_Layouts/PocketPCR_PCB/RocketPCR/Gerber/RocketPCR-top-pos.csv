@@ -1,0 +1,8 @@
+Ref,Val,Package,PosX,PosY,Rot,Side
+"G***","LOGO","HotSurfaceWarning",3.306000,0.614000,0.000000,top
+"S1","OLED_DISPLAY","OLED_096_1_Flip",22.473000,4.534000,0.000000,top
+"X2","PAD","SolderPad1_8mm",-16.336949,6.917170,0.000000,top
+"X3","PAD","SolderPad1_8mm",-19.691051,5.827356,0.000000,top
+"X4","PAD","SolderPad1_8mm",-16.336949,1.210830,0.000000,top
+"X6","PAD","SolderPad1_8mm",-19.691051,2.300644,0.000000,top
+"X7","PAD","SolderPad1_8mm",-12.699000,4.111000,0.000000,top

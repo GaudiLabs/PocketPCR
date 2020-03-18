@@ -1,0 +1,7 @@
+### Module positions - created on Do 13 Feb 2020 17:24:32 CET ###
+### Printed by Pcbnew version kicad 5.0.2-bee76a0~70~ubuntu18.04.1
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val           Package                PosX       PosY       Rot  Side
+S1        OLED_DISPLAY  OLED_096_1_Flip     22.4730     4.5340    0.0000  top
+## End
