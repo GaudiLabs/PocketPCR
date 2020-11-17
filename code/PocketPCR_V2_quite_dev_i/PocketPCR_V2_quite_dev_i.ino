@@ -1,23 +1,11 @@
 /*
-  Analog input, analog output, serial output
+PocketPCR PCR Thermocycler by GaudiLabs
+Pocket size USB powered PCR Thermo Cycler
 
-  Reads an analog input pin, maps the result to a range from 0 to 255 and uses
-  the result to set the pulse width modulation (PWM) of an output pin.
-  Also prints the results to the Serial Monitor.
+http://gaudi.ch/PocketPCR/
 
-  The circuit:
-  - potentiometer connected to analog pin 0.
-    Center pin of the potentiometer goes to the analog pin.
-    side pins of the potentiometer go to +5V and ground
-  - LED connected from digital pin 9 to ground
+https://github.com/GaudiLabs/PocketPCR
 
-  created 29 Dec. 2008
-  modified 9 Apr 2012
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/AnalogInOutSerial
 */
 
 #include <math.h> 
@@ -28,14 +16,14 @@
 
 #include <Fonts/FreeSans9pt7b.h>
 
-const char VersionString[] = "V1.01 2019";
+const char VersionString[] = "V1.02 2020";
 
 // These constants won't change. They're used to give names to the pins used:
-const int analogInPin = A2;  // Analog input pin that the potentiometer is attached to
-const int fanPin = 4; // Analog output pin that the LED is attached to
+const int analogInPin = A2;  // Analog input pin that the temperature sensor is attached to
+const int fanPin = 4; // Analog output pin that the fan is attached to
 const int heaterPin = 8; // Analog output pin that the LED is attached to
 const int lidPin = 9; // Analog output pin that the LED is attached to
-const int butPin = A4; // Analog output pin that the LED is attached to
+const int butPin = A4; // Analog output pin that the button is attached to
 
 const int NTC_B = 3435;
 const float NTC_TN = 298.15;
@@ -44,7 +32,7 @@ const float NTC_R0 = 4.7;
 
 const float temperature_tollerance=0.5;
 // Rotary encoder is wired with the common to ground and the two
-// outputs to pins 2 and 3.
+// outputs to pins 6 and 7.
 #define ENCODER_1 6
 #define ENCODER_2 7
 Rotary rotary = Rotary(ENCODER_1, ENCODER_2);
@@ -87,8 +75,8 @@ EEprom settings;
   
 Adafruit_SSD1306 display( OLED_MOSI,OLED_CLK,OLED_DC, OLED_RESET, OLED_CS);
 
-int sensorValue = 0;        // value read from the pot
-int outputValue = 0;        // value output to the PWM (analog out)
+int sensorValue = 0;        // value read from the sesnor
+int outputValue = 0;        // value output to the PWM (heater)
 float temperature =0;
 float temperature_mean =0;
 
@@ -98,8 +86,8 @@ float sensorVoltage =0;
 boolean editMode = false;
 boolean minuteMode = false;
 
-int counter = 0;        // value read from the pot
-int counter_save = 0;        // value read from the pot
+int counter = 0;        
+int counter_save = 0;      
 
 int x=0;
 int caseUX = CASE_Main; 
