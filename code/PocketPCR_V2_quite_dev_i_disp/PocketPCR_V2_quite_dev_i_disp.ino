@@ -37,6 +37,10 @@ const float temperature_tollerance=0.5;
 #define ENCODER_2 7
 Rotary rotary = Rotary(ENCODER_1, ENCODER_2);
 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+
 // If using software SPI (the default case):
 #define OLED_MOSI   20
 #define OLED_CLK   21
@@ -44,6 +48,9 @@ Rotary rotary = Rotary(ENCODER_1, ENCODER_2);
 #define OLED_CS    22 //12
 #define OLED_RESET 5
 
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
+  OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+  
 #define CASE_Main 1
 #define CASE_Settings 2
 #define CASE_EditSettings 3
@@ -73,7 +80,6 @@ int value[SETTING_Size*2];
 FlashStorage(my_flash_store, EEprom);
 EEprom settings;
   
-Adafruit_SSD1306 display( OLED_MOSI,OLED_CLK,OLED_DC, OLED_RESET, OLED_CS);
 
 int sensorValue = 0;        // value read from the sesnor
 int outputValue = 0;        // value output to the PWM (heater)
