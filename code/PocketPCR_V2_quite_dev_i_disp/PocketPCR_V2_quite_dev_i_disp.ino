@@ -16,7 +16,7 @@ https://github.com/GaudiLabs/PocketPCR
 
 #include <Fonts/FreeSans9pt7b.h>
 
-const char VersionString[] = "V1.02 2020";
+const char VersionString[] = "V1.03 2026";
 
 // These constants won't change. They're used to give names to the pins used:
 const int analogInPin = A2;  // Analog input pin that the temperature sensor is attached to
@@ -31,6 +31,11 @@ const int NTC_RN = 10000;
 const float NTC_R0 = 4.7;
 
 const float temperature_tollerance=0.5;
+
+// Safety limits: if the block reads outside this range the sensor is most
+// likely open/shorted, so the heater is switched off and an error is shown.
+const float TEMP_SAFETY_MAX = 110.0;
+const float TEMP_SAFETY_MIN = -20.0;
 // Rotary encoder is wired with the common to ground and the two
 // outputs to pins 6 and 7.
 #define ENCODER_1 6
@@ -56,6 +61,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
 #define CASE_EditSettings 3
 #define CASE_Run 4
 #define CASE_Done 5
+#define CASE_Error 6
 
 #define PCR_set 1
 #define PCR_transition 2
@@ -92,7 +98,7 @@ float sensorVoltage =0;
 boolean editMode = false;
 boolean minuteMode = false;
 
-int counter = 0;        
+volatile int counter = 0;   // changed from the encoder interrupt
 int counter_save = 0;      
 
 int x=0;
@@ -111,12 +117,15 @@ bool PIDIntegration = false;
 float TEMPcontrol;
 float TEMPdif_a[10];
 float TEMPd;
-long TEMPclick=0;
-long TIMEclick=0;
+unsigned long TEMPclick=0;
+unsigned long TIMEclick=0;
+unsigned long TRANSclick=0;
+#define FINAL_TRANSITION_TIMEOUT 120000UL  // ms
 int TIMEcontrol=0;
 
 int heatPower = 191;
 int fanPower=0;
+bool temperatureValid = false;
 void setup() {
 
   pinMode(ENCODER_1, INPUT_PULLUP);
@@ -130,7 +139,7 @@ void setup() {
   attachInterrupt(ENCODER_1, rotate, CHANGE);
   attachInterrupt(ENCODER_2, rotate, CHANGE);
 
-  // initialize serial communications at 9600 bps:
+  // initialize serial communications at 115200 bps:
   Serial.begin(115200);
 
   display.begin(SSD1306_SWITCHCAPVCC);
@@ -201,7 +210,17 @@ void loop() {
 sensorVoltage=3.3*sensorValue/4096;
 sensorResistance=((sensorVoltage*NTC_R0)/(3.3-sensorVoltage));
 temperature=  1/(log(sensorResistance*1000/NTC_RN)/NTC_B+1/NTC_TN)-273.15 ;
-temperature_mean= (temperature_mean*3+temperature)/4;
+if (isnan(temperature) || isinf(temperature)) temperature = TEMP_SAFETY_MIN - 1;
+if (!temperatureValid) {temperature_mean = temperature; temperatureValid = true;}  // don't start the filter from 0
+else temperature_mean= (temperature_mean*3+temperature)/4;
+
+// Thermal safety cut-off: an open or shorted sensor reads far out of range
+// and would otherwise drive the heater at full power indefinitely.
+if ((temperature_mean > TEMP_SAFETY_MAX) || (temperature_mean < TEMP_SAFETY_MIN)) {
+  TEMPcontrol = 0;
+  setHeater(0, 0);
+  caseUX = CASE_Error;
+}
 
   // print the results to the Serial Monitor:
   //Serial.print("sensor = ");
@@ -224,7 +243,8 @@ case CASE_Main:
    
    if (!digitalRead(butPin)) {while (!digitalRead(butPin));
    
-   if (MenuItem==0) {caseUX=CASE_Run;casePCR=PCR_set; PCRstate=0; counter=0;}
+   if (MenuItem==0) {caseUX=CASE_Run;casePCR=PCR_set; PCRstate=0; PCRcycle=1; counter=0;
+                      TEMPi=0; TEMPd=0; for (int i=0;i<10;i++) TEMPdif_a[i]=0;}
    if (MenuItem==1) {caseUX=CASE_Settings; counter=0;}
 
    }
@@ -236,10 +256,10 @@ case CASE_Settings:
     if (counter>12) counter=0;
     if (counter<0) counter=12;
     MenuItem = counter;
-    if ((MenuItem%2==1)&&(settings.value[MenuItem]>90)) minuteMode=true; else minuteMode=false;
+    if ((MenuItem<10)&&(MenuItem%2==1)&&(settings.value[MenuItem]>90)) minuteMode=true; else minuteMode=false;
     if (!digitalRead(butPin)) 
     {while (!digitalRead(butPin)); caseUX=CASE_EditSettings; 
-    if (minuteMode) counter=settings.value[MenuItem]/60; else counter=settings.value[MenuItem];}
+    if (MenuItem<11) {if (minuteMode) counter=settings.value[MenuItem]/60; else counter=settings.value[MenuItem];}}
     draw_setup_display();
     
     break;
@@ -260,6 +280,7 @@ case CASE_EditSettings:
      else
       {if (minuteMode)
        {if (counter<2) {minuteMode=false; counter=90;}
+        if (counter>99) counter=99;  // cap at 99 min
        }  //Minut Mode
        else
        {
@@ -271,7 +292,11 @@ case CASE_EditSettings:
     if (MenuItem==11) {caseUX=CASE_Main;   my_flash_store.write(settings);}
     if (MenuItem==12) {caseUX=CASE_Main;  settings=my_flash_store.read();}
 
-    if (MenuItem<11) {if (minuteMode) settings.value[MenuItem]=counter*60; else settings.value[MenuItem]=counter;}
+    if (MenuItem<11) {
+      // In minute mode only write when the minute value actually changed, so
+      // opening a value like 150 s does not silently round it down to 120 s.
+      if (minuteMode) {if (counter != settings.value[MenuItem]/60) settings.value[MenuItem]=counter*60;}
+      else settings.value[MenuItem]=counter;}
     if (!digitalRead(butPin)) {while (!digitalRead(butPin)); caseUX=CASE_Settings;counter=MenuItem;}
     draw_setup_display();
     
@@ -299,6 +324,7 @@ case CASE_Run:
     TEMPset=settings.value[PCRstate*2];
     TIMEcontrol=settings.value[1+PCRstate*2];
     PIDIntegration=false;
+    TRANSclick=millis();
     casePCR=PCR_transition;
     break;
 
@@ -306,7 +332,12 @@ case CASE_Run:
     case PCR_transition:
     runPID();
     draw_run_display();
-    if (abs(TEMPset-temperature_mean)<temperature_tollerance) {PIDIntegration=true;TEMPi=0;TIMEclick=millis(); casePCR=PCR_time;}
+    if ((fabs(TEMPset-temperature_mean)<temperature_tollerance)
+        // The block can only cool to room temperature. In a warm room the
+        // Final hold (default 25 C) is never reached and the run never ends,
+        // so give up waiting for the Final target after FINAL_TRANSITION_TIMEOUT.
+        || ((PCRstate==4) && (millis()-TRANSclick > FINAL_TRANSITION_TIMEOUT)))
+       {PIDIntegration=true;TEMPi=0;TIMEclick=millis(); casePCR=PCR_time;}
     break;
 
 
@@ -316,8 +347,8 @@ case CASE_Run:
     draw_run_display();
 
     if (TIMEcontrol<=0) {
-      if (PCRstate==4) caseUX=CASE_Done;
-    if (PCRstate==3)
+      if (PCRstate==4) {caseUX=CASE_Done;}
+    else if (PCRstate==3)
     {PCRstate=1;
     PCRcycle++;
     if (PCRcycle>settings.value[10]) PCRstate=4;
@@ -356,6 +387,27 @@ case CASE_Done:
 
 
 if (!digitalRead(butPin)) {while (!digitalRead(butPin)); caseUX=CASE_Main;counter=MenuItem;}
+
+break;
+
+case CASE_Error:
+
+  // Latched until power is cycled: heater and fan stay off.
+  TEMPcontrol=0;
+  setHeater(0, 0);
+
+    display.clearDisplay();
+    display.setTextColor(1);
+    display.setCursor(5,10);
+    display.println("SENSOR ERROR");
+    display.setCursor(5,25);
+    display.println("Heater switched off.");
+    display.setCursor(5,40);
+    display.print("Reading: ");
+    display.print(temperature_mean,1);
+    display.setCursor(5,52);
+    display.println("Unplug USB to reset.");
+    display.display();
 
 break;
       
@@ -552,7 +604,7 @@ void draw_run_display()
  display.fillRect(0,0,128,11,1);
   display.setCursor(16,2);
  display.setTextColor(0);
- if (counter%2==0)  {display.println("  PCR Running");} else
+ if ((counter & 1)==0)  {display.println("  PCR Running");} else
   {display.println("Press to STOP PCR"); if (!digitalRead(butPin)) {while (!digitalRead(butPin)); caseUX=CASE_Done;counter=MenuItem;}
 }
  display.setTextColor(1);
@@ -594,8 +646,6 @@ display.print("State: ");
  display.print(" s");
 
 
- display.setCursor(1,25);
- display.drawLine(x,10*(temperature_mean-25),x,10*(temperature_mean-25),1);
 
  display.display();
 
@@ -668,7 +718,7 @@ void runPID()
   }
   else 
   {
-  if (TEMPcontrol>0)
+  if (power>0)
   {
     heatPower=power_heating(temperature,power);
   analogWrite(fanPin,0);

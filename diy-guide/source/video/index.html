@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:#f3f4f6;font-family:'DejaVu Sans',Arial,sans-serif}
+#c{position:absolute;left:0;top:0}
+#hud{position:absolute;left:36px;top:30px;display:flex;align-items:center;gap:18px}
+#badge{width:64px;height:64px;border-radius:50%;background:#222;color:#fff;font-weight:bold;font-size:34px;display:flex;align-items:center;justify-content:center}
+#title{font-size:30px;font-weight:bold;color:#222}
+#sub{position:absolute;left:36px;top:108px;font-size:20px;color:#444;max-width:640px;line-height:1.35}
+#warn{position:absolute;left:36px;bottom:70px;font-size:17px;color:#7a5b00;background:#fff4c2;border:1px solid #e0c040;border-radius:6px;padding:6px 12px;display:none}
+#bar{position:absolute;left:36px;right:36px;bottom:30px;display:flex;gap:6px}
+#bar div{flex:1;height:10px;border-radius:5px;background:#d6d8dc}
+#bar div.on{background:#1f6feb}
+#bar div.done{background:#8bb7f5}
+#brand{position:absolute;right:36px;top:34px;font-size:15px;color:#888;text-align:right}
+#intro{position:absolute;left:0;right:0;top:40px;display:flex;flex-direction:column;align-items:center}
+#intro h1{font-size:64px;margin:0;color:#222}
+#intro p{font-size:24px;color:#555;margin:10px}
+</style></head>
+<body>
+<canvas id="c" width="1280" height="720"></canvas>
+<div id="hud"><div id="badge">1</div><div id="title"></div></div>
+<div id="sub"></div>
+<div id="warn"></div>
+<div id="bar"></div>
+<div id="brand">PocketPCR<br>unofficial assembly animation</div>
+<div id="intro"><h1 id="ih"></h1><p id="ip"></p></div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, preserveDrawingBuffer:true});
+renderer.setSize(1280,720,false);
+renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf3f4f6);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(32, 1280/720, 1, 2000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 0.9));
+const dl = new THREE.DirectionalLight(0xffffff, 1.6); dl.position.set(80,160,120); scene.add(dl);
+
+// ground
+const ground = new THREE.Mesh(new THREE.CircleGeometry(260,64), new THREE.MeshStandardMaterial({color:0xe6e8eb, roughness:1}));
+ground.rotation.x = -Math.PI/2; ground.position.y = -24; scene.add(ground);
+
+const M = (c, o={}) => new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:0.5, metalness:0.0}, o));
+const mPCB = M(0x1d1f22,{roughness:0.6});
+const mAlu = M(0xc9ccd1,{metalness:0.9, roughness:0.32});
+const mSteel = M(0x2b2b2e,{metalness:0.8, roughness:0.35});
+const mBrass = M(0xc8a24a,{metalness:0.9, roughness:0.3});
+const mGold = M(0xd4af37,{metalness:1, roughness:0.25});
+const mFan = M(0x2e2f33,{roughness:0.7});
+const mRubber = M(0x101010,{roughness:0.9});
+const mWhite = M(0xf7f7f7,{roughness:0.6});
+const mNylon = M(0x161616,{roughness:0.55});
+const mSolder = M(0xdedede,{metalness:1, roughness:0.15, emissive:0x000000});
+const mHeader = M(0x111111);
+
+// coordinates: board top-view (mx,my) in mm -> x = mx-52.5, z = my-16.5
+const X = mx => mx-52.5, Z = my => my-16.5;
+function add(mesh, parent=scene){ parent.add(mesh); return mesh; }
+function box(w,h,d,mat){ return new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); }
+function cyl(r,h,mat,seg=32,r2){ return new THREE.Mesh(new THREE.CylinderGeometry(r2??r,r,h,seg), mat); }
+
+// ---------- BOARD (A) ----------
+const board = new THREE.Group(); scene.add(board);
+const pcbShape = new THREE.Shape();
+(function(){ const w=105,h=33,r=2; const x0=-w/2,y0=-h/2; pcbShape.moveTo(x0+r,y0); pcbShape.lineTo(x0+w-r,y0); pcbShape.quadraticCurveTo(x0+w,y0,x0+w,y0+r); pcbShape.lineTo(x0+w,y0+h-r); pcbShape.quadraticCurveTo(x0+w,y0+h,x0+w-r,y0+h); pcbShape.lineTo(x0+r,y0+h); pcbShape.quadraticCurveTo(x0,y0+h,x0,y0+h-r); pcbShape.lineTo(x0,y0+r); pcbShape.quadraticCurveTo(x0,y0,x0+r,y0);})();
+const fanHoles = [[4,4.5],[28,4.5],[4,28.5],[28,28.5]];
+const rearHoles = [[93,4.5],[93,28.5]];
+for (const [hx,hy] of [...fanHoles,...rearHoles]) { const p=new THREE.Path(); p.absarc(X(hx),Z(hy)*-1,1.7,0,Math.PI*2,true); pcbShape.holes.push(p); }
+const pcbGeo = new THREE.ExtrudeGeometry(pcbShape,{depth:1.6,bevelEnabled:false});
+const pcb = new THREE.Mesh(pcbGeo, mPCB); pcb.rotation.x = -Math.PI/2; pcb.position.y = -0.8; board.add(pcb);
+// screen
+const scrCanvas = document.createElement('canvas'); scrCanvas.width=340; scrCanvas.height=220;
+const sctx = scrCanvas.getContext('2d');
+const scrTex = new THREE.CanvasTexture(scrCanvas); scrTex.colorSpace = THREE.SRGBColorSpace;
+function drawScreen(on){
+  sctx.fillStyle='#05080c'; sctx.fillRect(0,0,340,220);
+  if(on){ sctx.fillStyle='#7fd3ff'; sctx.fillRect(40,40,260,62); sctx.fillStyle='#05080c'; sctx.font='bold 40px DejaVu Sans'; sctx.fillText('Run PCR',80,86);
+          sctx.fillStyle='#7fd3ff'; sctx.fillText('Setup',105,170); }
+  scrTex.needsUpdate=true;
+}
+drawScreen(false);
+const oledFrame = box(34,1.6,22,M(0x0b0d10)); oledFrame.position.set(X(59),0.8+0.8,Z(15)); board.add(oledFrame);
+const oled = new THREE.Mesh(new THREE.PlaneGeometry(30,19.5), new THREE.MeshBasicMaterial({map:scrTex}));
+oled.rotation.x=-Math.PI/2; oled.position.set(X(59),2.45,Z(15)); board.add(oled);
+// heat block with 5 tube wells
+const block = new THREE.Group(); block.position.set(X(14),0.8,Z(16.5)); board.add(block);
+const blk = cyl(9.75,10,mAlu,48); blk.position.y=5; block.add(blk);
+for(let k=0;k<5;k++){ const a=Math.PI/2+k*2*Math.PI/5; const w=cyl(2.3,0.3,M(0x15171a),24); w.position.set(5.6*Math.cos(a),10.05,5.6*Math.sin(a)); block.add(w);}
+const ctr = cyl(1.4,0.3,M(0x15171a),20); ctr.position.y=10.05; block.add(ctr);
+// usb-c
+const usb = box(7.5,3.2,9,M(0xb8bbc0,{metalness:0.9,roughness:0.3})); usb.position.set(X(101.5),2.4,Z(12.5)); board.add(usb);
+// a few SMD chips for realism
+for (const [mx,my,w,d] of [[30,8,7,7],[33,26,4,3],[47,29,3,2],[70,29,3,2],[90,10,4,4],[24,30,2,1.2],[52,30,2,1.2]]) { const ch=box(w,1,d,M(0x111111)); ch.position.set(X(mx),1.3,Z(my)); board.add(ch); }
+// heater connector at left
+const j4 = box(3,5,9,M(0xf2f2f2)); j4.position.set(X(1.8),3.3,Z(16.5)); board.add(j4);
+
+// ---------- parts ----------
+function makeHeader(){ const g=new THREE.Group(); const b=box(5.1,2.5,2.5,mHeader); g.add(b);
+  for(const dx of [-1.27,1.27]){ const p=box(0.64,11.5,0.64,mGold); p.position.set(dx,-1.5,0); g.add(p);} return g; }
+function makeEncoder(){ const g=new THREE.Group(); const b=box(12,6.5,12.5,M(0x6b6e73,{metalness:0.6,roughness:0.4})); b.position.y=3.25; g.add(b);
+  const bush=cyl(3.5,5,M(0xbfc3c8,{metalness:0.9,roughness:0.3})); bush.position.y=9; g.add(bush);
+  const sh=cyl(3,9,M(0xd5d8dc,{metalness:0.9,roughness:0.3})); sh.position.y=15.5; g.add(sh);
+  for(const dx of [-2.5,0,2.5]){ const p=box(0.8,4,0.8,mGold); p.position.set(dx,-2,-7.5+0.0); g.add(p);}
+  for(const dx of [-2.5,2.5]){ const p=box(0.8,4,0.8,mGold); p.position.set(dx,-2,7); g.add(p);}
+  for(const dx of [-5.7,5.7]){ const p=box(0.6,4,2.2,M(0x9a9da2,{metalness:0.8})); p.position.set(dx,-2,0); g.add(p);}
+  return g; }
+function makeFan(){ const g=new THREE.Group();
+  const sh=new THREE.Shape(); sh.moveTo(-15,-15); sh.lineTo(15,-15); sh.lineTo(15,15); sh.lineTo(-15,15); sh.lineTo(-15,-15);
+  const hole=new THREE.Path(); hole.absarc(0,0,13.5,0,Math.PI*2,true); sh.holes.push(hole);
+  for(const [x,y] of [[-12,-12],[12,-12],[-12,12],[12,12]]){ const h=new THREE.Path(); h.absarc(x,y,1.6,0,Math.PI*2,true); sh.holes.push(h);}
+  const fr=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:10,bevelEnabled:false}),mFan); fr.rotation.x=-Math.PI/2; fr.position.y=-10; g.add(fr);
+  const rotor=new THREE.Group(); g.add(rotor); rotor.position.y=-5;
+  const hub=cyl(6,8,M(0x222326)); rotor.add(hub);
+  const lab=cyl(5.5,0.2,M(0xe8e8e8)); lab.position.y=4.05; rotor.add(lab);
+  for(let k=0;k<7;k++){ const bl=box(7,0.8,4.5,M(0x2a2b2e)); const a=k*2*Math.PI/7; bl.position.set(9.5*Math.cos(a),0,9.5*Math.sin(a)); bl.rotation.y=-a; bl.rotation.x=0.5; rotor.add(bl);}
+  g.userData.rotor=rotor; return g; }
+function makeScrew(len, mat=mSteel, head='pan'){ const g=new THREE.Group();
+  const shaft=cyl(1.5,len,mat,16); shaft.position.y=-len/2; g.add(shaft);
+  let hd; if(head==='pan'){ hd=cyl(2.8,2,mat,24); hd.position.y=1; } else { hd=cyl(3.6,4,mat,24); hd.position.y=2; }
+  g.add(hd); if(head==='pan'){ const sl=box(3.5,0.6,0.8,M(0x050505)); sl.position.y=2.0; g.add(sl); const sl2=sl.clone(); sl2.rotation.y=Math.PI/2; g.add(sl2);} return g; }
+function makeNut(){ const n=cyl(3.17,2.4,M(0xa7aaae,{metalness:0.9,roughness:0.3}),6); return n; }
+function makeSpacer(L){ const s=cyl(3.17,L,mBrass,6); s.geometry.translate(0,-L/2,0); return s; }
+function makeFoot(){ const g=new THREE.Group(); const f=cyl(4,3,mRubber,24); f.position.y=-1.5; g.add(f); return g; }
+function makeKnob(){ const g=new THREE.Group(); const k=cyl(7,12,M(0xc7cacf,{metalness:0.95,roughness:0.25}),48); k.position.y=6; g.add(k);
+  const top=cyl(5,0.3,M(0x9da1a7,{metalness:0.9,roughness:0.35}),40); top.position.y=12.1; g.add(top);
+  const mark=box(0.8,0.4,4,M(0x222222)); mark.position.set(0,12.2,-3); g.add(mark); return g; }
+function makeLid(){ const sh=new THREE.Shape(); sh.absarc(0,0,10.5,0,Math.PI*2,false);
+  for(let k=0;k<5;k++){ const a=Math.PI/2+k*2*Math.PI/5; const h=new THREE.Path(); h.absarc(5.6*Math.cos(a),-5.6*Math.sin(a),2.6,0,Math.PI*2,true); sh.holes.push(h);}
+  const c=new THREE.Path(); c.absarc(0,0,1.7,0,Math.PI*2,true); sh.holes.push(c);
+  const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:1.2,bevelEnabled:false}),mWhite); m.rotation.x=-Math.PI/2; const g=new THREE.Group(); g.add(m); return g; }
+function makeSpring(){ const pts=[]; for(let i=0;i<=200;i++){ const t=i/200; const a=t*Math.PI*2*7; pts.push(new THREE.Vector3(2.4*Math.cos(a),-t*8,2.4*Math.sin(a))); }
+  return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),400,0.25,8,false), M(0xbfc3c8,{metalness:1,roughness:0.25})); }
+function makeTube(){ const g=new THREE.Group(); const mat=M(0xffffff,{transparent:true,opacity:0.55,roughness:0.2});
+  const body=cyl(2.9,12,mat,24,3.1); body.position.y=6; g.add(body); const cone=cyl(0.8,8,mat,24,2.9); cone.position.y=-4+0; g.add(cone);
+  const liq=cyl(2.0,7,M(0x7fb3ff,{transparent:true,opacity:0.85}),20,2.6); liq.position.y=2; g.add(liq);
+  const cap=cyl(3.4,2,mat,24); cap.position.y=13; g.add(cap); return g; }
+function solderDot(){ return new THREE.Mesh(new THREE.SphereGeometry(0.9,16,10), mSolder.clone()); }
+
+// instantiate
+const header = add(makeHeader());
+const enc = add(makeEncoder());
+const fan = add(makeFan());
+const screwsK = fanHoles.map(()=>add(makeScrew(16)));
+const nuts = [add(makeNut()), add(makeNut())];
+const sp10 = [add(makeSpacer(10)), add(makeSpacer(10))];
+const screwsL = rearHoles.map(()=>add(makeScrew(6)));
+const sp20 = [add(makeSpacer(20)), add(makeSpacer(20))];
+const feet = [0,1,2,3].map(()=>add(makeFoot()));
+const knob = add(makeKnob());
+const lid = add(makeLid());
+const spring = add(makeSpring());
+const thumb = add(makeScrew(25, mNylon, 'thumb'));
+const tubes = [0,1,2,3,4].map(()=>add(makeTube()));
+// fan cable + plug
+const plug = add(box(5.2,5,2.6,M(0xf2f2f2)));
+const wireMatR = new THREE.LineBasicMaterial({color:0xd1242f}), wireMatB = new THREE.LineBasicMaterial({color:0x111111});
+const wireR = add(new THREE.Mesh(new THREE.BufferGeometry(), M(0xd1242f)));
+const wireB = add(new THREE.Mesh(new THREE.BufferGeometry(), M(0x111111)));
+// usb cable
+const usbPlug = add(box(14,4,9,M(0x2b2b2e))); const usbCable = add(cyl(1.8,60,M(0x2b2b2e),12));
+// solder dots
+const dotsTop = [-1.27,1.27].map(dx=>{const d=add(solderDot()); d.position.set(X(39.2)+dx,1.0,Z(27.7)); return d;});
+const dotsEnc = [[-2.5,-7.5],[0,-7.5],[2.5,-7.5],[-2.5,7],[2.5,7],[-5.7,0],[5.7,0]].map(([dx,dz])=>{const d=add(solderDot()); d.position.set(X(81.9)+dx,-1.0,Z(24)+dz); return d;});
+
+// ---------- timeline ----------
+const ease = t => t<0?0:t>1?1:t*t*(3-2*t);
+const seg = (t,a,b) => ease((t-a)/(b-a));
+const lerp=(a,b,u)=>a+(b-a)*u;
+const lerpV=(a,b,u)=>[lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)];
+
+const STEPS = [
+ {t:0,  n:'', title:'', sub:''},
+ {t:5,  n:1, title:'Solder the fan header D', sub:'Push the 2-pin header in from UNDER the board (long pins point down). Solder the 2 pins on the TOP side.', warn:'Exact spot taken from the PCB layout (J1). See note N1.'},
+ {t:15, n:2, title:'Solder the knob switch C', sub:'Insert from the TOP: 5 pins + 2 metal tabs. Tape it flat, flip the board, solder all 7 from below.'},
+ {t:25, n:3, title:'Fit the fan B under the block', sub:'4x M3x16 screws from the top through board and fan. Underneath: 2 nuts, 2 short (10 mm) spacers. Don\'t over-tighten.', warn:'Which holes get nuts vs spacers is our reading of the parts list (N3).'},
+ {t:39, n:4, title:'Plug in the fan', sub:'Push the fan plug onto header D. If the fan won\'t spin later, turn the plug round.'},
+ {t:45, n:5, title:'Legs at the USB end', sub:'2x M3x6 screws from the top into 2x 20 mm spacers. All four legs now end at the same height.'},
+ {t:52, n:6, title:'Rubber feet', sub:'Push a rubber foot onto each of the 4 legs.'},
+ {t:57, n:7, title:'Knob cap', sub:'Press the aluminium cap straight down onto the switch shaft.'},
+ {t:62, n:8, title:'Tubes and lid', sub:'Up to 5 PCR tubes (25-50 µl + 15-30 µl oil). Lid disc, spring and thumb screw on top. Screw in gently.'},
+ {t:72, n:9, title:'Power on', sub:'Plug in USB-C, 5 V / 2 A or more. The screen shows "Run PCR / Setup". Done!'},
+ {t:80, n:'✓', title:'Finished', sub:'Full picture guide + India buying list: pocketpcr-picture-guide-india.pdf'},
+];
+const TOTAL = 86;
+const bar = document.getElementById('bar');
+for (let i=1;i<STEPS.length-1;i++){ bar.appendChild(document.createElement('div')); }
+
+// camera keyframes [time, pos, target]
+const CAM = [
+ [0,   [170,140,230],[0,-4,0]],
+ [5,   [150,140,200],[0,-4,0]],
+ [7,   [10,-80,170],[X(39),-4,Z(20)]],
+ [11,  [0,110,150],[X(39),0,Z(20)]],
+ [15,  [90,120,160],[X(78),0,Z(18)]],
+ [20,  [110,-80,140],[X(78),-2,Z(18)]],
+ [25,  [-60,80,200],[X(20),-8,0]],
+ [30,  [-110,-50,190],[X(20),-10,0]],
+ [39,  [-40,-70,160],[X(36),-8,Z(22)]],
+ [45,  [170,-10,190],[X(85),-12,0]],
+ [52,  [0,-30,200],[0,-12,0]],
+ [57,  [130,120,180],[X(78),4,Z(20)]],
+ [62,  [-90,140,160],[X(20),6,Z(10)]],
+ [72,  [120,90,150],[10,0,0]],
+ [80,  [-120,110,170],[0,0,0]],
+ [86,  [-170,90,90],[0,0,0]],
+];
+function camAt(t){ let i=0; while(i<CAM.length-2 && t>CAM[i+1][0]) i++; const [t0,p0,g0]=CAM[i],[t1,p1,g1]=CAM[i+1]; const u=ease((t-t0)/(t1-t0)); return [lerpV(p0,p1,u), lerpV(g0,g1,u)]; }
+
+function place(obj, from, to, u, visible=true){ const p=lerpV(from,to,u); obj.position.set(p[0],p[1],p[2]); obj.visible=visible; }
+function vis(obj, v){ obj.visible = v; }
+
+function wire(mesh, pts){ mesh.geometry.dispose(); mesh.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p))),40,0.45,6,false); }
+
+window.renderAt = function(t){
+  // HUD
+  let si=0; for(let i=0;i<STEPS.length;i++) if(t>=STEPS[i].t) si=i;
+  const S=STEPS[si];
+  const intro=document.getElementById('intro');
+  if(si===0){ intro.style.display='flex'; document.getElementById('ih').textContent='PocketPCR'; document.getElementById('ip').textContent='Step-by-step assembly  ·  9 steps  ·  ~30 min';
+     document.getElementById('hud').style.display='none'; document.getElementById('sub').textContent=''; }
+  else { intro.style.display='none'; document.getElementById('hud').style.display='flex'; document.getElementById('badge').textContent=S.n; document.getElementById('title').textContent=S.title; document.getElementById('sub').textContent=S.sub; }
+  const w=document.getElementById('warn'); if(S.warn){ w.style.display='block'; w.textContent='⚠ '+S.warn; } else w.style.display='none';
+  [...bar.children].forEach((d,i)=>{ d.className = (i+1===si)?'on':((i+1<si)?'done':''); });
+
+  // board orientation: always flat
+  const bx = mx=>X(mx), bz=my=>Z(my);
+  // 1. header from below
+  place(header,[X(39.2),-30,Z(27.7)],[X(39.2),-0.8-1.25,Z(27.7)],seg(t,6,9),t>=5.5);
+  header.rotation.x=0;
+  const solderOn1 = t>9.5;
+  dotsTop.forEach((d,i)=>{ d.visible = t>9.5+i*0.6; const g=Math.max(0,1-Math.abs(t-(10+i*0.6))*1.5); d.material.emissive.setRGB(g*1.0,g*0.45,0); });
+  // 2. encoder from above
+  place(enc,[X(81.9),45,Z(24)],[X(81.9),0.8,Z(24)],seg(t,16,19),t>=15.5);
+  dotsEnc.forEach((d,i)=>{ d.visible = t>20.5+i*0.4; const g=Math.max(0,1-Math.abs(t-(21+i*0.4))*1.5); d.material.emissive.setRGB(g,g*0.45,0); });
+  // 3. fan from below, screws from above, nuts/spacers
+  const fx=X(16), fz=Z(16.5);
+  place(fan,[fx,-60,fz],[fx,-0.8,fz],seg(t,26,29));
+  fan.visible = t>=25.5;
+  fanHoles.forEach(([hx,hy],i)=>{ const u=seg(t,29.5+i*0.5,31.5+i*0.5); place(screwsK[i],[X(hx),50,Z(hy)],[X(hx),0.8,Z(hy)],u, t>=29); screwsK[i].rotation.y = u*12; });
+  // nuts on mx=28 holes (index 1,3), 10mm spacers on mx=4 holes (index 0,2)
+  [[1,0],[3,1]].forEach(([hi,k])=>{ const [hx,hy]=fanHoles[hi]; const u=seg(t,33+k*0.6,35+k*0.6); place(nuts[k],[X(hx),-45,Z(hy)],[X(hx),-10.8-1.2,Z(hy)],u,t>=32.5); nuts[k].rotation.y=u*6; });
+  [[0,0],[2,1]].forEach(([hi,k])=>{ const [hx,hy]=fanHoles[hi]; const u=seg(t,34.5+k*0.6,36.5+k*0.6); place(sp10[k],[X(hx),-55,Z(hy)],[X(hx),-10.8,Z(hy)],u,t>=34); sp10[k].rotation.y=u*6; });
+  // 4. plug + wires
+  const plugTo=[X(39.2),-0.8-2.5-2.5-4,Z(27.7)], plugFrom=[X(39.2)-8,-22,Z(27.7)+8];
+  const up=seg(t,40.5,43); const pp=lerpV(plugFrom,plugTo,up);
+  plug.position.set(...pp); plug.visible = t>=40;
+  wireR.visible=wireB.visible=t>=40;
+  if(t>=40){ const s=[fx+15,-6,fz+11]; wire(wireR,[s,[s[0]+4,-14,s[2]+4],[pp[0]-0.7,pp[1]-4,pp[2]],[pp[0]-0.7,pp[1]-2,pp[2]]]); wire(wireB,[[s[0],s[1],s[2]+1],[s[0]+4,-15,s[2]+5],[pp[0]+0.7,pp[1]-4,pp[2]],[pp[0]+0.7,pp[1]-2,pp[2]]]); }
+  // 5. rear legs
+  rearHoles.forEach(([hx,hy],i)=>{ const u=seg(t,46+i*0.6,48+i*0.6); place(screwsL[i],[X(hx),40,Z(hy)],[X(hx),0.8,Z(hy)],u,t>=45.5); screwsL[i].rotation.y=u*8;
+    const v=seg(t,48.5+i*0.6,50.5+i*0.6); place(sp20[i],[X(hx),-60,Z(hy)],[X(hx),-0.8,Z(hy)],v,t>=48); sp20[i].rotation.y=v*6; });
+  // 6. feet
+  const legs=[[fanHoles[0][0],fanHoles[0][1],-20.8],[fanHoles[2][0],fanHoles[2][1],-20.8],[rearHoles[0][0],rearHoles[0][1],-20.8],[rearHoles[1][0],rearHoles[1][1],-20.8]];
+  legs.forEach(([hx,hy,yy],i)=>{ const u=seg(t,52.5+i*0.5,54.5+i*0.5); place(feet[i],[X(hx),-50,Z(hy)],[X(hx),yy,Z(hy)],u,t>=52); });
+  // 7. knob
+  place(knob,[X(81.9),55,Z(24)],[X(81.9),12,Z(24)],seg(t,57.5,60),t>=57);
+  // 8. tubes, lid, spring, thumb
+  const bTop=10.8;
+  tubes.forEach((tb,k)=>{ const a=Math.PI/2+k*2*Math.PI/5; const tx=X(14)+5.6*Math.cos(a), tz=Z(16.5)+5.6*Math.sin(a); place(tb,[tx,60,tz],[tx,bTop-1,tz],seg(t,62.5+k*0.4,64.5+k*0.4),t>=62); });
+  const lidY=bTop+14.5;
+  place(lid,[X(14),70,Z(16.5)],[X(14),lidY,Z(16.5)],seg(t,66,68),t>=65.5);
+  place(spring,[X(14),68,Z(16.5)],[X(14),lidY,Z(16.5)],seg(t,66,68),t>=65.5);
+  const tu=seg(t,68,71); place(thumb,[X(14),80,Z(16.5)],[X(14),lidY+1.2,Z(16.5)],tu,t>=67.5); thumb.rotation.y=tu*20;
+  // 9. usb + screen
+  const uu=seg(t,73,75.5);
+  usbPlug.position.set(lerp(X(105)+40,X(105)+7,uu),2.4,Z(12.5)); usbPlug.visible=t>=72.5;
+  usbCable.rotation.z=Math.PI/2; usbCable.position.set(usbPlug.position.x+37,2.4,Z(12.5)); usbCable.visible=usbPlug.visible;
+  drawScreen(t>76);
+  // fan spins at the end
+  fan.userData.rotor.rotation.y = t>77 ? (t-77)*25 : 0;
+
+  camera.setViewOffset(1280,720,-90,-60,1280,720);
+  const [cp,ct]=camAt(t); camera.position.set(...cp); camera.lookAt(...ct);
+  renderer.render(scene,camera);
+  return true;
+};
+window.TOTAL = TOTAL;
+window.ready = true;
+</script>
+</body></html>
