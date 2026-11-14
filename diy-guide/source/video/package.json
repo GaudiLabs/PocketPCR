@@ -1,0 +1,9 @@
+{
+  "name": "pocketpcr-assembly-video",
+  "private": true,
+  "description": "Renders the PocketPCR 3D assembly animation (three.js) to frames with Playwright",
+  "dependencies": {
+    "three": "0.170.0",
+    "playwright": "^1.48.0"
+  }
+}
