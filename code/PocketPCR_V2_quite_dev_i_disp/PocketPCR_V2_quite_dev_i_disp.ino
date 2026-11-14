@@ -119,6 +119,8 @@ float TEMPdif_a[10];
 float TEMPd;
 unsigned long TEMPclick=0;
 unsigned long TIMEclick=0;
+unsigned long TRANSclick=0;
+#define FINAL_TRANSITION_TIMEOUT 120000UL  // ms
 int TIMEcontrol=0;
 
 int heatPower = 191;
@@ -322,6 +324,7 @@ case CASE_Run:
     TEMPset=settings.value[PCRstate*2];
     TIMEcontrol=settings.value[1+PCRstate*2];
     PIDIntegration=false;
+    TRANSclick=millis();
     casePCR=PCR_transition;
     break;
 
@@ -329,7 +332,12 @@ case CASE_Run:
     case PCR_transition:
     runPID();
     draw_run_display();
-    if (fabs(TEMPset-temperature_mean)<temperature_tollerance) {PIDIntegration=true;TEMPi=0;TIMEclick=millis(); casePCR=PCR_time;}
+    if ((fabs(TEMPset-temperature_mean)<temperature_tollerance)
+        // The block can only cool to room temperature. In a warm room the
+        // Final hold (default 25 C) is never reached and the run never ends,
+        // so give up waiting for the Final target after FINAL_TRANSITION_TIMEOUT.
+        || ((PCRstate==4) && (millis()-TRANSclick > FINAL_TRANSITION_TIMEOUT)))
+       {PIDIntegration=true;TEMPi=0;TIMEclick=millis(); casePCR=PCR_time;}
     break;
 
 
